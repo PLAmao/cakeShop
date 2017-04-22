@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<title>订单列表</title>
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<link rel="stylesheet" type="text/css" href="css/orderList.css">
+</head>
+<body>
+	<header class="header">
+		<div class="header-wrap clearfix">
+			<a href="javascript:history.go(-1);" class="goBackBtn">&lt;</a>
+			<span>订单列表</span>
+			<a href="/" class="indexBtn">首页</a>
+		</div>
+	</header>
+	<!-- selectbar begin -->
+	<ul class="selectbar">
+		<li >
+			<a href="/orderList">全部</a>
+		</li>
+		<li>
+			<a href="/orderListPayment">待付款</a>
+		</li>
+		<li>
+			<a href="/orderListConfrimRec">待收货</a>
+		</li>
+
+	</ul>
+	<!-- selectbar end -->
+	<section>
+		<div class="cart-list">
+			{{{#each(data)}}}
+			<div class="cart-item clearfix">
+				
+				<img src="/upload/{{this.filepath}}">
+				<div class="good-info">
+					<p>{{this.name}}</p>
+					{{#if( this.isPlay==="0" )}}
+					<p>待付款</p>
+					{{elseif (this.isRecevied==="0")}}
+					<p>待收货</p>
+					{{else}}
+					<p>交易完成</p>
+					{{/if}}
+					<div class="btn-group">
+						{{#if( this.isPlay==="0" )}}
+						<a href="javascript:;" class="payment" alt="{{this._id}}">去付款</a>
+						
+						{{elseif (this.isRecevied==="0")}}
+						<a href="javascript:;" class="confirmRec" alt="{{this._id}}">确认收货</a>
+						{{else}}
+						
+						{{/if}}
+						
+					</div>
+					<span class="delBtn" alt="{{this._id}}"></span>
+				</div>
+			</div>
+			{{{/each}}}
+		</div>
+	</section>
+	<!-- footer begin -->
+	<footer class="footer">
+		<p>时尚·美味·健康</p>
+		<p>一条介于平凡与不平凡之间的蛋糕街</p>
+	</footer>
+	<!-- footer end -->
+</body>
+</html>
+<script type="text/javascript" src="../bowersrc/zepto/zepto.min.js"></script>
+<script type="text/javascript">
+	window.onload = function(){
+		//控制导航栏的高亮
+		var liArr = $('.selectbar li');
+		
+		if(window.location.toString().indexOf('Payment') != -1){
+			$(liArr[1]).addClass('active');
+		}else if(window.location.toString().indexOf('ConfrimRec') != -1){
+			$(liArr[2]).addClass('active');
+		}else if(window.location.toString().indexOf('orderList')){
+			$(liArr[0]).addClass('active');
+		}
+
+		//选中的商品，前面变成选中状态
+		var checkboxArr = document.querySelectorAll('.checkbox');
+		for(var i=0;i<checkboxArr.length;i++){
+			checkboxArr[i].onclick = function(){
+				this.setAttribute('checked','true');
+			}
+		}
+
+		//删除商品
+		var delBtnArr = document.querySelectorAll('.delBtn');
+		
+		for(var i=0;i<delBtnArr.length;i++){
+			delBtnArr[i].onclick = function(){
+				var result = confirm('确定要删除？');
+				if(result){
+					$.get('/delOrder',{id:$(this).attr('alt')},function(data){
+						alert(data.message);
+						window.location = window.location;
+					},'json');
+				}
+			}
+		}
+
+		//去付款功能
+		var paymentArr = $('.payment');
+		for(var i=0;i<paymentArr.length;i++){
+			paymentArr[i].onclick = function(){
+				$.get('/payment',{id:$(this).attr('alt')},function(data){
+					alert(data.message);
+					window.location = window.location;
+				},'json');
+			}
+		}
+
+		//确认收货
+		var confirmRecArr = $('.confirmRec');
+		for(var i=0;i<confirmRecArr.length;i++){
+			confirmRecArr[i].onclick = function(){
+				$.get('/confirmRec',{id:$(this).attr('alt')},function(data){
+
+					alert(data.message);
+					window.location = window.location;
+				},'json');
+			}
+		}
+	}
+</script>
